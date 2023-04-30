@@ -18,8 +18,8 @@ data class OpenDossier<Case: CaseContext>(
     override val id: DossierId,
     override val case: Case,
 ) : Dossier<Case> {
-    fun process(time: Instant) = ProcessingDossier(id, case, time)
     constructor(case: Case): this(DossierId(UUID.randomUUID()), case)
+    fun process(time: Instant) = ProcessingDossier(id, case, time)
 }
 
 data class ProcessingDossier<Case: CaseContext>(
