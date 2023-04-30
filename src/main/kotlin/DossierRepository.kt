@@ -10,7 +10,7 @@ class StateRepository {
     }
 
     fun update(dossier: Dossier<CivilCase>) {
-        store.removeAll { it.id == dossier.case.id.value }
+        store.removeAll { it.id == dossier.id.value }
         store.add(dossier.asDossierEntity())
     }
 
@@ -42,22 +42,25 @@ private fun Dossier<CivilCase>.asDossierEntity(): CivilLawDossierEntity = when (
 }
 
 private fun OpenDossier<CivilCase>.asOpenDossierEntity() = CivilLawDossierEntity(
-    id = case.id.value,
+    id = id.value,
     state = State.Open,
+    case = case,
     started = null,
     ruling = null,
 )
 
 private fun ProcessingDossier<CivilCase>.asProcessingDossierEntity() = CivilLawDossierEntity(
-    id = case.id.value,
+    id = id.value,
     state = State.Processing,
+    case = case,
     started = started,
     ruling = null,
 )
 
 private fun FinalizedDossier<CivilCase>.asFinalizedDossierEntity() = CivilLawDossierEntity(
-    id = case.id.value,
+    id = id.value,
     state = State.Finalized,
+    case = case,
     started = started,
     ruling = ruling,
 )
@@ -69,27 +72,27 @@ private fun CivilLawDossierEntity.asDossierModel(): Dossier<CivilCase> = when (t
 }
 
 private fun CivilLawDossierEntity.asOpenDossierModel() = OpenDossier(
-    case = extractContext(),
+    id = DossierId(id),
+    case = case,
 )
 
 private fun CivilLawDossierEntity.asProcessingDossierModel() = ProcessingDossier(
-    case = extractContext(),
-    started = started!!
+    id = DossierId(id),
+    case = case,
+    started = started!!,
 )
 
 private fun CivilLawDossierEntity.asFinalizedDossierModel() = FinalizedDossier(
-    case = extractContext(),
+    id = DossierId(id),
+    case = case,
     started = started!!,
     ruling = ruling!!,
-)
-
-private fun CivilLawDossierEntity.extractContext() = CivilCase(
-    id = DossierId(id)
 )
 
 private data class CivilLawDossierEntity(
     val id: UUID,
     val state: State,
+    val case: CivilCase,
     val started: Instant?,
     val ruling: CourtRuling?,
 )

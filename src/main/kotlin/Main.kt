@@ -1,19 +1,25 @@
 import java.time.Instant
-import java.util.*
 
 fun main() {
     val repo = StateRepository()
 
-    val open = OpenDossier(CivilCase(DossierId(UUID.randomUUID())))
-    repo.store(open)
+    val case = CivilCase(defendant = "Bill Wellington", prosecutor = "Juan Marques")
+    val openDossier: OpenDossier<CivilCase> = OpenDossier(case)
+    repo.store(openDossier)
     repo.printAll()
 
-    val processing = open.process(Instant.now())
-    repo.update(processing)
+    val startTime = Instant.now()
+    val processingDossier: ProcessingDossier<CivilCase> = openDossier.process(startTime)
+    repo.update(processingDossier)
     repo.printAll()
 
-    val finalized = processing.finalize(CourtRuling("Case denied"))
-    repo.update(finalized)
+    val ruling = CourtRuling(result = "Case dismissed")
+    val finalizedDossier: FinalizedDossier<CivilCase> = processingDossier.finalize(ruling)
+    repo.update(finalizedDossier)
+    repo.printAll()
+
+    val reopenedDossier: OpenDossier<CivilCase> = finalizedDossier.reopen()
+    repo.update(reopenedDossier)
     repo.printAll()
 }
 
